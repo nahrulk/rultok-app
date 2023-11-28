@@ -1,11 +1,11 @@
-import MainLayout from "./layouts/MainLayout";
+import UploadLayout from "./layouts/UploadLayout";
 
 export default function Home() {
   return (
     <>
-      <MainLayout>
+      <UploadLayout>
         <div>Home</div>
-      </MainLayout>
+      </UploadLayout>
     </>
   );
 }
