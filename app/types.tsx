@@ -31,6 +31,11 @@ export interface PostWithProfile {
   };
 }
 
+export interface UploadError {
+  type: string;
+  message: string;
+}
+
 /////////////////////////////////
 ////////////////////////////////
 

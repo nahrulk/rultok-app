@@ -1,11 +1,11 @@
 import ClientOnly from "./components/ClientOnly";
 import PostMain from "./components/PostMain";
-import UploadLayout from "./layouts/UploadLayout";
+import MainLayout from "./layouts/MainLayout";
 
 export default function Home() {
   return (
     <>
-      <UploadLayout>
+      <MainLayout>
         <div className="mt-[80px] w-[calc(100%-90px)] max-w-[690px] ml-auto">
           <ClientOnly>
             <PostMain
@@ -24,7 +24,7 @@ export default function Home() {
             />
           </ClientOnly>
         </div>
-      </UploadLayout>
+      </MainLayout>
     </>
   );
 }
