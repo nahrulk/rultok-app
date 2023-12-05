@@ -19,7 +19,7 @@ export default function AuthOverlay() {
             <AiOutlineClose size="26" />
           </button>
         </div>
-        {!isRegister ? <Register /> : <Login />}
+        {isRegister ? <Register /> : <Login />}
       </div>
     </div>
   );
