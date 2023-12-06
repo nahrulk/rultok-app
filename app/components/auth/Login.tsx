@@ -2,8 +2,13 @@ import { ShowErrorObject } from "@/app/types";
 import { useState } from "react";
 import TextInput from "../profile/TextInput";
 import { BiLoaderCircle } from "react-icons/bi";
+import { useUser } from "@/app/context/user";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const contextUser = useUser();
+  const router = useRouter();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string | "">("");
   const [password, setPassword] = useState<string | "">("");
@@ -17,8 +22,45 @@ export default function Login() {
     return "";
   };
 
-  const login = () => {
-    console.log("login");
+  const validate = () => {
+    setError(null);
+    let isError = false;
+
+    const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    if (!email) {
+      setError({ type: "email", message: "An Email is required" });
+      isError = true;
+    } else if (!reg.test(email)) {
+      setError({ type: "email", message: "The Email is not valid" });
+      isError = true;
+    } else if (!password) {
+      setError({ type: "password", message: "A Password is required" });
+      isError = true;
+    }
+
+    return isError;
+  };
+
+  const login = async () => {
+    let isError = validate();
+    if (isError) return;
+
+    if (!contextUser) return;
+
+    try {
+      setLoading(true);
+
+      await contextUser.login(email, password);
+
+      setLoading(false);
+      // setIsLoginOpen(false)
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      alert(error);
+    }
   };
 
   return (
