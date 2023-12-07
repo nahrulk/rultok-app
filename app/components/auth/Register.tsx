@@ -4,10 +4,13 @@ import TextInput from "../profile/TextInput";
 import { BiLoaderCircle } from "react-icons/bi";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/user";
+import { useGeneralStore } from "@/app/stores/general";
 
 export default function Register() {
   const contextUser = useUser();
   const router = useRouter();
+
+  let { setIsLoginOpen } = useGeneralStore();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string | "">("");
@@ -67,7 +70,7 @@ export default function Register() {
       await contextUser.register(name, email, password);
 
       setLoading(false);
-      // setIsLoginOpen(false)
+      setIsLoginOpen(false);
       router.refresh();
     } catch (error) {
       console.log(error);
