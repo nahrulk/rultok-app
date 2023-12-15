@@ -4,6 +4,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Link from "next/link";
 import { SiSoundcharts } from "react-icons/si";
 import { BiErrorCircle } from "react-icons/bi";
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl";
 
 export default function PostUser({ post }: PostUserCompType) {
   useEffect(() => {
@@ -33,9 +34,9 @@ export default function PostUser({ post }: PostUserCompType) {
             />
           </div>
         ) : (
-          <Link href={`post/${post.id}/${post.user_id}`}>
+          <Link href={`/post/${post.id}/${post.user_id}`}>
             <video
-              src={post.video_url}
+              src={useCreateBucketUrl(post.video_url)}
               id={`video${post.id}`}
               muted
               loop

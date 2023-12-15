@@ -8,6 +8,9 @@ import { FiLogOut } from "react-icons/fi";
 import { useUser } from "@/app/context/user";
 import { useGeneralStore } from "@/app/stores/general";
 import { RandomUsers } from "@/app/types";
+import debounce from "debounce";
+import useSearchProfilesByName from "@/app/hooks/useSearchProfilesByName";
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl";
 
 export default function TopNav() {
   const contexUser = useUser();
@@ -19,9 +22,22 @@ export default function TopNav() {
   let [showMenu, setShowMenu] = useState<boolean>(false);
   let { setIsLoginOpen, setIsEditProfileOpen } = useGeneralStore();
 
-  const handleSearchName = (event: { target: { value: string } }) => {
-    console.log(event.target.value);
-  };
+  const handleSearchName = debounce(
+    async (event: { target: { value: string } }) => {
+      if (event?.target?.value == "") return setSearchProfile([]);
+
+      try {
+        const result = await useSearchProfilesByName(event?.target?.value);
+        if (result) return setSearchProfile(result);
+        setSearchProfile([]);
+      } catch (error) {
+        console.log(error);
+        setSearchProfile([]);
+        alert(error);
+      }
+    },
+    500
+  );
 
   useEffect(() => {
     setIsEditProfileOpen(false);
@@ -58,23 +74,27 @@ export default function TopNav() {
               placeholder="Search Account"
             />
 
-            <div className="absolute bg-white max-w-[910px] h-auto w-full z-20 left-0 top-12 border p-1 ">
-              <div className="p-1">
-                <Link
-                  href={"/profile/1"}
-                  className="flex items-center justify-between w-full cursor-pointer hover:bg-[#f12b56] p-1 px-2 hover:text-white rounded"
-                >
-                  <div className="flex items-center">
-                    <img
-                      src="https://placehold.co/40"
-                      className="rounded-md"
-                      width={40}
-                    />
-                    <div className="truncate ml-2">Nahrul Khayattullah</div>
+            {searchProfile.length > 0 ? (
+              <div className="absolute bg-white max-w-[910px] h-auto w-full z-20 left-0 top-12 border p-1 ">
+                {searchProfile.map((profile, index) => (
+                  <div className="p-1" key={index}>
+                    <Link
+                      href={`/profile/${profile?.id}`}
+                      className="flex items-center justify-between w-full cursor-pointer hover:bg-[#f12b56] p-1 px-2 hover:text-white rounded"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={useCreateBucketUrl(profile?.image)}
+                          className="rounded-md"
+                          width={40}
+                        />
+                        <div className="truncate ml-2">{profile?.name}</div>
+                      </div>
+                    </Link>
                   </div>
-                </Link>
+                ))}
               </div>
-            </div>
+            ) : null}
 
             <div className="px-3 py-1 flex items-center border-l border-l-gray-300 ">
               <BiSearch color="#A1A2A7" size="22" />
@@ -111,13 +131,19 @@ export default function TopNav() {
                   >
                     <img
                       className="rounded-full w-[35px] h-[35px]"
-                      src="https://placehold.co/35"
+                      src={useCreateBucketUrl(contexUser?.user?.image || "")}
                     />
                   </button>
 
                   {showMenu ? (
                     <div className="absolute bg-white rounded-lg py-1.5 w-[200px] shadow-xl border top-[40px] right-0">
-                      <button className="flex items-center w-full justify-start py-3 px-2 hover:bg-gray-100 cursor-pointer">
+                      <button
+                        onClick={() => {
+                          router.push(`/profile/${contexUser?.user?.id}`);
+                          setShowMenu(false);
+                        }}
+                        className="flex items-center w-full justify-start py-3 px-2 hover:bg-gray-100 cursor-pointer"
+                      >
                         <BiUser size={20} />
                         <span className="pl-2 font-semibold text-sm">
                           Profile

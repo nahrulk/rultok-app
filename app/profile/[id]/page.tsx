@@ -3,33 +3,38 @@
 import ClientOnly from "@/app/components/ClientOnly";
 import EditProfileOverlay from "@/app/components/profile/EditProfileOverlay";
 import PostUser from "@/app/components/profile/PostUser";
+import { useUser } from "@/app/context/user";
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl";
 import MainLayout from "@/app/layouts/MainLayout";
+import { useGeneralStore } from "@/app/stores/general";
+import { usePostStore } from "@/app/stores/post";
+import { useProfileStore } from "@/app/stores/profile";
 import { ProfilePageTypes } from "@/app/types";
+import { useEffect } from "react";
 import { BsPencil } from "react-icons/bs";
 
 export default function Profile({ params }: ProfilePageTypes) {
-  const curentProfile = {
-    id: "1",
-    user_id: "1234",
-    name: "Nahrul Khayattullah",
-    username: "@nahrul.k",
-    image: "https://placehold.co/200",
-    bio: "Hello this is Nahrul the test user",
-  };
+  const contextUser = useUser();
+
+  let { postsByUser, setPostsByUser } = usePostStore();
+  let { currentProfile, setCurrentProfile } = useProfileStore();
+  let { isEditProfileOpen, setIsEditProfileOpen } = useGeneralStore();
+
+  useEffect(() => {
+    setCurrentProfile(params?.id);
+    setPostsByUser(params?.id);
+  }, []);
 
   return (
     <>
       <MainLayout>
-        <ClientOnly>
-          <EditProfileOverlay />
-        </ClientOnly>
         <div className="pt-[90px] ml-[90px] 2xl:pl-[185px] lg:pl-[160px] lg:pr-0 w-[calc(100%-90px)] pr-3 max-w-[1800px] 2xl:mx-auto">
           <div className="flex w-[calc(100vw-230px)]">
             <ClientOnly>
-              {true ? (
+              {currentProfile ? (
                 <img
                   className="w-[120px] min-w-[120px] rounded-full"
-                  src={curentProfile.image}
+                  src={useCreateBucketUrl(currentProfile?.image || "")}
                 />
               ) : (
                 <div className="min-w-[150px] h-[120px] bg-gray-200 rounded-full"></div>
@@ -37,21 +42,28 @@ export default function Profile({ params }: ProfilePageTypes) {
             </ClientOnly>
             <div className="ml-5 w-full">
               <ClientOnly>
-                {curentProfile.name ? (
+                {currentProfile?.name ? (
                   <div>
                     <p className="text-[30px] font-bold truncate">
-                      {curentProfile.name}
+                      {currentProfile?.name}
                     </p>
-                    <p className="text-[18px] truncate">
-                      {curentProfile.username}
-                    </p>
+                    {/* <p className="text-[18px] truncate">
+                      {currentProfile?.username}
+                    </p> */}
                   </div>
                 ) : (
                   <div className="h-[60px]" />
                 )}
               </ClientOnly>
-              {true ? (
-                <button className="flex item-center rounded-md py-1.5 px-3.5 mt-3 text-[15px] font-semibold border hover:bg-gray-100">
+              {contextUser?.user?.id == params.id ? (
+                <button
+                  onClick={() => {
+                    setIsEditProfileOpen(
+                      (isEditProfileOpen = !isEditProfileOpen)
+                    );
+                  }}
+                  className="flex item-center rounded-md py-1.5 px-3.5 mt-3 text-[15px] font-semibold border hover:bg-gray-100"
+                >
                   <BsPencil className="mt-0.5 mr-1" size="18" />
                   <span>Edit profile</span>
                 </button>
@@ -78,7 +90,7 @@ export default function Profile({ params }: ProfilePageTypes) {
           </div>
           <ClientOnly>
             <p className="pt-4 mr-4 text-gray-500 font-light text-[15px] pl-1.5 max-w-[500px]">
-              {curentProfile?.bio}
+              {currentProfile?.bio}
             </p>
           </ClientOnly>
 
@@ -93,7 +105,11 @@ export default function Profile({ params }: ProfilePageTypes) {
 
           <ClientOnly>
             <div className="mt-4 grid 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-3">
-              <PostUser
+              {postsByUser.map((post, index) => (
+                <PostUser post={post} key={index} />
+              ))}
+
+              {/* <PostUser
                 post={{
                   id: "123",
                   user_id: "456",
@@ -101,7 +117,7 @@ export default function Profile({ params }: ProfilePageTypes) {
                   text: "Rounded corners. Use utilities like rounded-sm , rounded , or rounded-lg to apply different border radius sizes to an element",
                   created_at: "date here",
                 }}
-              />
+              /> */}
             </div>
           </ClientOnly>
         </div>

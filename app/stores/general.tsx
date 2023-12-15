@@ -6,10 +6,10 @@ import useGetRandomUsers from "../hooks/useGetRandomUsers";
 interface GeneralStore {
   isLoginOpen: boolean;
   isEditProfileOpen: boolean;
-  randomUser: RandomUsers[];
+  randomUsers: RandomUsers[];
   setIsLoginOpen: (val: boolean) => void;
   setIsEditProfileOpen: (val: boolean) => void;
-  setRandomUser: () => void;
+  setRandomUsers: () => void;
 }
 
 export const useGeneralStore = create<GeneralStore>()(
@@ -18,13 +18,13 @@ export const useGeneralStore = create<GeneralStore>()(
       (set) => ({
         isLoginOpen: false,
         isEditProfileOpen: false,
-        randomUser: [],
+        randomUsers: [],
 
         setIsLoginOpen: (val: boolean) => set({ isLoginOpen: val }),
         setIsEditProfileOpen: (val: boolean) => set({ isEditProfileOpen: val }),
-        setRandomUser: async () => {
+        setRandomUsers: async () => {
           const result = await useGetRandomUsers();
-          set({ randomUser: result });
+          set({ randomUsers: result });
         },
       }),
       {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MenuItemFollowCompTypes } from "../../types";
 import { AiOutlineCheck } from "react-icons/ai";
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl";
 
 export default function MenuItemFollow({ user }: MenuItemFollowCompTypes) {
   return (
@@ -10,7 +11,7 @@ export default function MenuItemFollow({ user }: MenuItemFollowCompTypes) {
         className="flex items-center hover:bg-gray-100 rounded-md w-full py-1.5 px-2"
       >
         <img
-          src={user?.image || "/images/defaultAvatar.png"}
+          src={useCreateBucketUrl(user?.image || "")}
           alt="avatar"
           className="rounded-full lg:mx-0 mx-auto"
           width={35}

@@ -1,4 +1,9 @@
+import { useUser } from "@/app/context/user";
+import useCreateBucketUrl from "@/app/hooks/useCreateBucketUrl";
+import useDeleteComment from "@/app/hooks/useDeleteComment";
+import { useCommentStore } from "@/app/stores/comment";
 import { SingleCommentCompTypes } from "@/app/types";
+import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -8,13 +13,23 @@ export default function SingleComment({
   comment,
   params,
 }: SingleCommentCompTypes) {
+  const contexUser = useUser();
+  let { setCommentsByPost } = useCommentStore();
+
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-  const deleteThisComment = () => {
+  const deleteThisComment = async () => {
     let res = confirm("Are you sure want to delete this comment?");
     if (!res) return;
 
-    //Do something
+    try {
+      setIsDeleting(true);
+      useDeleteComment(comment.id);
+      setCommentsByPost(params?.postId);
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
   };
 
   return (
@@ -28,7 +43,7 @@ export default function SingleComment({
             <img
               className="absolute top-0 rounded-full lg:mx-0 mx-auto"
               width={40}
-              src={comment?.profile?.image}
+              src={useCreateBucketUrl(comment?.profile?.image)}
             />
           </Link>
           <div className="ml-14 pt-0.5 w-full">
@@ -36,10 +51,10 @@ export default function SingleComment({
               <span className="flex items-center">
                 {comment?.profile?.name} -{" "}
                 <span className="text-[12px] text-gray-600 font-light ml-1">
-                  {comment?.created_at}{" "}
+                  {moment(comment?.created_at).calendar()}
                 </span>
               </span>
-              {true ? (
+              {contexUser?.user?.id == comment.profile.user_id ? (
                 <button
                   className=""
                   disabled={isDeleting}
